@@ -10,25 +10,9 @@
       margin: 0;
       padding: 0;
     }
-    #chat-toggle {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #ffffffcc;
-      border: 2px solid #ccc;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      font-size: 24px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    #chat-toggle:hover {
-      background: #f0f0f0;
-    }
     #chat-box {
       position: fixed;
-      bottom: 90px;
+      bottom: 20px;
       right: 20px;
       width: 320px;
       height: 400px;
@@ -36,10 +20,9 @@
       border: 1px solid #ccc;
       border-radius: 15px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      display: none;
+      display: flex;
       flex-direction: column;
       overflow: hidden;
-      transition: opacity 0.4s ease;
     }
     #chat-header {
       background: #ffffff;
@@ -90,8 +73,6 @@
   </style>
 </head>
 <body>
-  <button id="chat-toggle">💬</button>
-
   <div id="chat-box">
     <div id="chat-header">Tutor</div>
     <div id="chat-messages"></div>
@@ -102,15 +83,10 @@
   </div>
 
   <script>
-    const toggle = document.getElementById("chat-toggle");
     const box = document.getElementById("chat-box");
     const input = document.getElementById("user-input");
     const sendBtn = document.getElementById("send-btn");
     const messages = document.getElementById("chat-messages");
-
-    toggle.addEventListener("click", () => {
-      box.style.display = box.style.display === "flex" ? "none" : "flex";
-    });
 
     async function sendMessage() {
       const text = input.value.trim();
