@@ -9,21 +9,37 @@
       background: white;
       margin: 0;
       padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+    }
+    #chat-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #ffffffcc;
+      border: 2px solid #ccc;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 24px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    #chat-toggle:hover {
+      background: #f0f0f0;
     }
     #chat-box {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
       width: 320px;
       height: 400px;
       background: rgba(255, 255, 255, 0.9);
       border: 1px solid #ccc;
       border-radius: 15px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      display: flex;
+      display: none;
       flex-direction: column;
       overflow: hidden;
+      transition: opacity 0.4s ease;
     }
     #chat-header {
       background: #ffffff;
@@ -40,22 +56,14 @@
     }
     .msg {
       margin-bottom: 10px;
-      padding: 6px 10px;
-      border-radius: 10px;
-      max-width: 80%;
-      word-wrap: break-word;
     }
     .user {
       text-align: right;
       color: #444;
-      background: #e3f2fd;
-      margin-left: auto;
     }
     .bot {
       text-align: left;
       color: #000;
-      background: #f5f5f5;
-      margin-right: auto;
     }
     #chat-input {
       display: flex;
@@ -82,59 +90,45 @@
   </style>
 </head>
 <body>
+  <button id="chat-toggle">💬</button>
+
   <div id="chat-box">
-    <div id="chat-header">Помощь преподавателя</div>
-    <div id="chat-messages">
-      <!-- Пример начального сообщения -->
-      <div class="msg bot">Ask me about Mass Media.</div>
-    </div>
+    <div id="chat-header">Tutor</div>
+    <div id="chat-messages"></div>
     <div id="chat-input">
       <input type="text" id="user-input" placeholder="Ask about Mass Media..." />
       <button id="send-btn">Send</button>
     </div>
   </div>
+
   <script>
+    const toggle = document.getElementById("chat-toggle");
+    const box = document.getElementById("chat-box");
     const input = document.getElementById("user-input");
     const sendBtn = document.getElementById("send-btn");
     const messages = document.getElementById("chat-messages");
 
+    toggle.addEventListener("click", () => {
+      box.style.display = box.style.display === "flex" ? "none" : "flex";
+    });
+
     async function sendMessage() {
       const text = input.value.trim();
       if (!text) return;
-
       addMessage("user", text);
       input.value = "";
-
-      // Пример: имитация ответа бота
-      setTimeout(() => {
-        addMessage("bot", "This is a demo response about Mass Media.");
-      }, 500);
-
-      // Если нужен реальный API-запрос, замени этот блок:
-      /*
-      try {
-        const resp = await fetch("https://api.mistral.ai/v1/chat", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer ТВОЙ_API_КЛЮЧ"
-          },
-          body: JSON.stringify({
-            model: "mistral-tiny",
-            messages: [{ role: "user", content: text }]
-          })
-        });
-        const data = await resp.json();
-        addMessage("bot", data.choices[0].message.content);
-      } catch (e) {
-        addMessage("bot", `Error: ${e.message}`);
-      }
-      */
+      const resp = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text })
+      });
+      const data = await resp.json();
+      addMessage("bot", data.reply || "Error.");
     }
 
     function addMessage(sender, text) {
       const div = document.createElement("div");
-      div.className = `msg ${sender}`;
+      div.className = "msg " + sender;
       div.textContent = text;
       messages.appendChild(div);
       messages.scrollTop = messages.scrollHeight;
